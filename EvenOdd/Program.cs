@@ -35,6 +35,16 @@ m = EvenOddAA();
 WriteLine("Результат = " + String.Join(", ", m));
 WriteLine();
 
+WriteLine("Коллекции");
+var l = EvenOddC();
+WriteLine("Результат = " + String.Join(", ", l));
+WriteLine();
+
+WriteLine("LINQ");
+l = EvenOddL();
+WriteLine("Результат = " + String.Join(", ", l));
+WriteLine();
+
 int[] EvenOddA()
 {
     int[] m = new int[n];
@@ -62,7 +72,7 @@ int[] EvenOddA()
     }
     WriteLine("Нечет = " + String.Join(", ", m1));
     WriteLine("Чет = " + String.Join(", ", m2));
-    
+    /*
     // пузырек по возрастанию для четных
     int temp;
     for (int i = 0; i < c2; i++)
@@ -90,9 +100,9 @@ int[] EvenOddA()
             }
         }
     }
-    
-//    QuickSort(m2, 0, c2 - 1);
-//    QuickSort(m1, 0, c1 - 1);
+    */
+    QuickSort(false, m2, 0, c2 - 1);
+    QuickSort(true, m1, 0, c1 - 1);
     WriteLine("После сортировки");
     WriteLine("Нечет = " + String.Join(", ", m1));
     WriteLine("Чет = " + String.Join(", ", m2));
@@ -109,21 +119,34 @@ int[] EvenOddA()
     return m;
 }
 
-int[] QuickSort(int[] array, int leftIndex, int rightIndex)
+int[] QuickSort(bool desc, int[] array, int leftIndex, int rightIndex)
 {
     var i = leftIndex;
     var j = rightIndex;
     var pivot = array[leftIndex];
     while (i <= j)
     {
-        while (array[i] < pivot)
+        if (!desc)
         {
-            i++;
+            while (array[i] < pivot)
+            {
+                i++;
+            }
+            while (array[j] > pivot)
+            {
+                j--;
+            }
         }
-
-        while (array[j] > pivot)
+        else
         {
-            j--;
+            while (array[i] > pivot)
+            {
+                i++;
+            }
+            while (array[j] < pivot)
+            {
+                j--;
+            }
         }
         if (i <= j)
         {
@@ -135,9 +158,9 @@ int[] QuickSort(int[] array, int leftIndex, int rightIndex)
         }
     }
     if (leftIndex < j)
-        QuickSort(array, leftIndex, j);
+        QuickSort(desc, array, leftIndex, j);
     if (i < rightIndex)
-        QuickSort(array, i, rightIndex);
+        QuickSort(desc, array, i, rightIndex);
     return array;
 }
 int[] EvenOddAA()
@@ -162,4 +185,50 @@ int[] EvenOddAA()
     m = [.. m2, .. m1];
 
     return m;
+}
+
+List<int> EvenOddC()
+{
+    List<int> l = new(n);
+    Random r = new();
+    for (int i = 0; i < n; i++)
+    {
+        l.Add(r.Next(max)); // l[i] = r.Next(max) - нельзя !!!
+    }
+    WriteLine("Исходный массив = " + String.Join(", ", l));
+    var l2 = new List<int>(l); // l2 = l
+    l2.RemoveAll(x => x % 2 != 0);
+    var l1 = new List<int>(l);
+    l1.RemoveAll(x => x % 2 == 0);
+    WriteLine("Нечет = " + String.Join(", ", l1));
+    WriteLine("Чет = " + String.Join(", ", l2));
+    l2.Sort();
+    l1.Sort((x, y) => y.CompareTo(x));
+    WriteLine("После сортировки");
+    WriteLine("Нечет = " + String.Join(", ", l1));
+    WriteLine("Чет = " + String.Join(", ", l2));
+    // l = l1.Concat(l2).ToList();
+    l = [.. l2, .. l1];
+
+    return l;
+}
+List<int> EvenOddL()
+{
+    Random r = new();
+    var l = Enumerable.Range(0, n).Select(x => r.Next(max)).ToList();
+    WriteLine("Исходный массив = " + String.Join(", ", l));
+    var l2 = from x in l
+             where x % 2 == 0
+             orderby x
+             select x;
+    var l1 = from x in l
+             where x % 2 != 0
+             orderby x descending
+             select x;
+    WriteLine("Нечет = " + String.Join(", ", l1));
+    WriteLine("Чет = " + String.Join(", ", l2));
+    // l = l2.Concat(l1).ToList();
+    l = [.. l2, .. l1];
+
+    return l;
 }
